@@ -1,0 +1,104 @@
+columns:
+- AnonymizationRule: null
+  LOV: []
+  Length: '12'
+  Mandatory: Oui
+  PrimaryKey: PK
+  Protected: null
+  name: IE_AFFAIRE
+  position: 1
+  type: varchar(12)
+- AnonymizationRule: null
+  LOV: []
+  Length: '12'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: ID_ELEMENT
+  position: 2
+  type: decimal(12)
+- AnonymizationRule: null
+  LOV: []
+  Length: '10'
+  Mandatory: Oui
+  PrimaryKey: PK
+  Protected: null
+  name: CODE_MOTIF
+  position: 3
+  type: varchar(10)
+- AnonymizationRule: null
+  LOV: []
+  Length: '10'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: DATE_TRAITEMENT
+  position: 4
+  type: date
+- AnonymizationRule: null
+  LOV: []
+  Length: '10'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: TIERS_CE
+  position: 5
+  type: varchar(10)
+- AnonymizationRule: null
+  LOV: []
+  Length: '10'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: FLAG_CE
+  position: 6
+  type: varchar(10)
+- AnonymizationRule: null
+  LOV: []
+  Length: '10'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: DATE_CREATION
+  position: 7
+  type: date
+- AnonymizationRule: null
+  LOV: []
+  Length: '10'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: DATE_ACCEPTATION
+  position: 8
+  type: date
+- AnonymizationRule: null
+  LOV: []
+  Length: '10'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: TIERS_ACCEPTEUR
+  position: 9
+  type: varchar(10)
+- AnonymizationRule: null
+  LOV: []
+  Length: '4'
+  Mandatory: non
+  PrimaryKey: null
+  Protected: null
+  name: CODE_ORIGINE
+  position: 10
+  type: varchar(4)
+data_type: Stack
+file_code: LSI_FIX_29
+file_id: Ekipfix
+footer: 'false'
+format: CSV
+header: 'true'
+layout_code: TO_COMPLETED
+layout_position: StartPosition:StopPosition
+periodicity: [daily]
+quote: null
+separator: ;
+table_name: STG_LSI_FIX_29
+table_name_output: STG_LSI_FIX_29_IN

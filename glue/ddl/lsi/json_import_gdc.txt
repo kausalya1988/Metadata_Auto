@@ -1,0 +1,2 @@
+gdc_STG_LSI_FIX_29_DAILY_IN.json
+gdc_STG_LSI_FIX_29_DAILY_OUT.json

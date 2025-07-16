@@ -1,0 +1,10 @@
+ddl_path: ddls-snowflake/lsi
+excel_file_path: datacontract/EKIP_LSI.xlsm
+glue_job_path: glue/ddl/lsi
+json_path: glue/ddl/lsi
+jv: INDIA
+multi_layout: '{{cookiecutter.multi_layout}}'
+project: lsi
+project_path: ekip-lsi
+source: EKIP
+yaml_path: glue/config/lsi

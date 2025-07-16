@@ -1,0 +1,2 @@
+lsi-ekip-india-s3sc.json
+lsi-ekip-india-ctop.json

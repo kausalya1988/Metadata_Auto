@@ -1,0 +1,70 @@
+${jv}_el_${source}_${period}:
+default_args:
+    owner: "airflow"
+    start_date: "2024-01-01"
+catchup: False
+description: "This is an example DAG"
+render_template_as_native_obj: True
+schedule_interval: None  # Pas de planification, à lancer manuellement
+tags:  # Ajout des tags ici
+    - el
+    - ${jv}
+    - ${source}
+    - ${period}
+tasks:
+    start:
+        operator: airflow.operators.dummy_operator.DummyOperator
+    end_workflow:
+        operator: airflow.operators.dummy_operator.DummyOperator
+    wait_for_sqs_message:
+        operator: airflow.providers.amazon.aws.sensors.sqs.SqsSensor
+        aws_conn_id: 'aws_default'  # AWS connection configured in Airflow
+        max_messages: 1  # Retrieve one message
+        message_filtering: 'jsonpath'
+        message_filtering_config: '$$.project'
+        message_filtering_match_values: ['${project}']
+        poke_interval: 5 * 60  # How often to poll the SQS queue (5 minutes)
+        timeout: 1 * 60 * 60  # Timeout for the sensor (1  heure)
+        mode: 'reschedule'  # 'reschedule' mode periodically checks the queue
+    extract_date_batch_task:
+        operator: airflow.operators.python.PythonOperator
+        python_callable: extract_date_batch
+        provide_context: True
+    run_glue_file_structure_check:
+        operator: operators.glue_operator.CustomGlueJobOperator
+        glue_job_name: glue-job-dlz-ENVIRONMENT-${project}-${source_split}-${jv}-s3sc${layout}
+        provide_context: True
+        on_failure_callback: 'lambda context: PsasmNotifier().notify(context)'
+    run_csv_to_parquet_conversion:
+        operator: operators.glue_operator.CustomGlueJobOperator
+        glue_job_name: glue-job-dlz-ENVIRONMENT-${project}-${source_split}-${jv}-ctop
+        provide_context: True
+        on_failure_callback: 'lambda context: PsasmNotifier().notify(context)'
+    dbt_run_refresh_external:
+        operator: operators.dbt_operator.DbtSimpleOperatorModel
+        dbt_operator: run-operation
+        dbt_object: refresh_external_tables_model_${source}
+        dbt_type_object: macro
+        provide_context: True
+        on_failure_callback: 'lambda context: PsasmNotifier().notify(context)'
+    dbt_test:
+        operator: operators.dbt_operator.DbtSimpleOperatorModel
+        dbt_operator: test
+        dbt_vars: '{{{{ var('date_variable', \'{{ ti.xcom_pull(key=\'dateBatch\') }}\') }}'
+        provide_context: True
+        on_failure_callback: 'lambda context: PsasmNotifier().notify(context)'
+    send_sns:
+        operator: airflow.operators.python.PythonOperator
+        python_callable: convert_csv_to_parquet
+        provide_context: True
+    end_error:
+        operator: airflow.operators.dummy_operator.DummyOperator
+        trigger_rule: 'one_failed'
+    end_successfull:
+        operator: airflow.operators.dummy_operator.DummyOperator
+        trigger_rule: 'all_success'
+# Define the task dependencies
+dependencies :
+ - start >> wait_for_sqs_message >> extract_date_batch_task >> run_glue_file_structure_check >> run_csv_to_parquet_conversion >> dbt_run_refresh_external >> send_sns >> end_workflow
+ - [extract_date_batch_task, run_glue_file_structure_check, run_csv_to_parquet_conversion, dbt_run_refresh_external, send_sns] >> end_successfull
+ - [extract_date_batch_task, run_glue_file_structure_check, run_csv_to_parquet_conversion, dbt_run_refresh_external, send_sns] >> end_error
